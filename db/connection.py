@@ -4,6 +4,8 @@ Uses psycopg2 with a simple connection pool.
 """
 
 import os
+from urllib.parse import urlparse, parse_qs
+
 import psycopg2
 from psycopg2 import pool
 from contextlib import contextmanager
@@ -14,22 +16,38 @@ load_dotenv()
 _pool: pool.SimpleConnectionPool | None = None
 
 
-def _clean_dsn(dsn: str) -> str:
+def _parse_db_url(url: str) -> dict:
     """
-    Strip Neon-specific URL params that older libpq versions reject.
-    `channel_binding` requires libpq 13+; GitHub Actions Ubuntu may ship older.
-    SSL is still enforced via `sslmode=require`.
+    Parse a postgres URL into psycopg2 keyword args.
+    This avoids DSN-string parsing issues with libpq versions that don't
+    recognize newer params like `channel_binding`. Only known-safe params
+    are forwarded to psycopg2.
     """
-    for bad in ("&channel_binding=require", "?channel_binding=require"):
-        dsn = dsn.replace(bad, "")
-    return dsn
+    p = urlparse(url)
+    kwargs = {
+        "host":     p.hostname,
+        "port":     p.port or 5432,
+        "user":     p.username,
+        "password": p.password,
+        "dbname":   (p.path or "/").lstrip("/"),
+    }
+    # Forward query params that psycopg2 / libpq understand widely.
+    safe_params = {"sslmode", "connect_timeout", "application_name"}
+    for k, v in parse_qs(p.query).items():
+        if k in safe_params and v:
+            kwargs[k] = v[0]
+    # Default to TLS for cloud Postgres (Neon, Supabase, etc.)
+    if "sslmode" not in kwargs and p.hostname and "neon.tech" in p.hostname:
+        kwargs["sslmode"] = "require"
+    return kwargs
 
 
 def _get_pool() -> pool.SimpleConnectionPool:
     global _pool
     if _pool is None:
-        dsn = _clean_dsn(os.environ["DATABASE_URL"])
-        _pool = pool.SimpleConnectionPool(minconn=1, maxconn=5, dsn=dsn)
+        url = os.environ["DATABASE_URL"].strip()
+        kwargs = _parse_db_url(url)
+        _pool = pool.SimpleConnectionPool(minconn=1, maxconn=5, **kwargs)
     return _pool
 
 
