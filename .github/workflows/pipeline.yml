@@ -1,0 +1,36 @@
+name: FinBrief Pipeline
+
+# Runs every 15 minutes — fetches RSS, prices, clusters with Gemini, dedups.
+# Also runnable manually from the Actions tab.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:        # manual trigger button
+
+# Cancel in-flight runs if a new schedule fires (prevents pile-up if a run is slow)
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          DATABASE_URL:    ${{ secrets.DATABASE_URL }}
+          GEMINI_API_KEY:  ${{ secrets.GEMINI_API_KEY }}
+        run: python main.py
