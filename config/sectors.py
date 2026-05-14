@@ -104,7 +104,9 @@ TICKER_SECTORS: dict[str, str] = {
     "INDUSTOWER.NS": "Telecom", "TATACOMM.NS": "Telecom",
 
     # ── Auto & Ancillaries ───────────────────────────────────────────────────
-    "MARUTI.NS": "Auto & Ancillaries", "TATAMOTORS.NS": "Auto & Ancillaries",
+    "MARUTI.NS": "Auto & Ancillaries",
+    "TMCV.NS": "Auto & Ancillaries",            # Tata Motors parent (CV + JLR)
+    "TMPV.NS": "Auto & Ancillaries",            # Tata Motors passenger vehicles
     "M&M.NS": "Auto & Ancillaries", "BAJAJ-AUTO.NS": "Auto & Ancillaries",
     "HEROMOTOCO.NS": "Auto & Ancillaries", "TVSMOTOR.NS": "Auto & Ancillaries",
     "EICHERMOT.NS": "Auto & Ancillaries", "ASHOKLEY.NS": "Auto & Ancillaries",
@@ -117,7 +119,7 @@ TICKER_SECTORS: dict[str, str] = {
     "HINDUNILVR.NS": "FMCG", "ITC.NS": "FMCG", "NESTLEIND.NS": "FMCG",
     "BRITANNIA.NS": "FMCG", "DABUR.NS": "FMCG", "MARICO.NS": "FMCG",
     "GODREJCP.NS": "FMCG", "COLPAL.NS": "FMCG", "EMAMILTD.NS": "FMCG",
-    "VBL.NS": "FMCG", "TATACONSUM.NS": "FMCG", "MCDOWELL-N.NS": "FMCG",
+    "VBL.NS": "FMCG", "TATACONSUM.NS": "FMCG", "UNITDSPR.NS": "FMCG",
     "RADICO.NS": "FMCG", "UBL.NS": "FMCG", "PATANJALI.NS": "FMCG",
 
     # ── Retail & Durables ────────────────────────────────────────────────────
@@ -195,6 +197,7 @@ TICKER_SECTORS: dict[str, str] = {
 
     # ── Aviation & Logistics ─────────────────────────────────────────────────
     "INDIGO.NS": "Aviation & Logistics",
+    "SPICEJET.BO": "Aviation & Logistics",
     "CONCOR.NS": "Aviation & Logistics", "GATI.NS": "Aviation & Logistics",
     "BLUEDART.NS": "Aviation & Logistics", "TCI.NS": "Aviation & Logistics",
     "MAHLOG.NS": "Aviation & Logistics",

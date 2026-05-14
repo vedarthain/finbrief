@@ -10,8 +10,10 @@ Run via:
     python -m ingestion.daily_history          # backfill all entities + watchlist
 """
 
+import json
 import logging
-from datetime import datetime, timezone
+import urllib.request
+from datetime import datetime, timezone, date
 
 import yfinance as yf
 
@@ -23,13 +25,59 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-8s  %(
 log = logging.getLogger(__name__)
 
 
+def _fetch_via_yahoo_v8(ticker: str, range_: str = "1mo") -> list[dict]:
+    """
+    Fallback: hit Yahoo Finance v8 chart endpoint directly.
+    yfinance's `Ticker.history()` sometimes returns 'possibly delisted' for
+    tickers that have changed (e.g. TATAMOTORS.NS → TMCV.NS post-demerger),
+    even when the new symbol is fine on the public chart endpoint.
+    """
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range={range_}&interval=1d"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.load(r)
+    except Exception as e:
+        log.warning("v8 fallback failed for %s: %s", ticker, e)
+        return []
+    result = data.get("chart", {}).get("result")
+    if not result:
+        return []
+    r0 = result[0]
+    timestamps = r0.get("timestamp") or []
+    quote = (r0.get("indicators", {}).get("quote") or [{}])[0]
+    rows = []
+    for i, ts in enumerate(timestamps):
+        try:
+            close  = quote["close"][i]
+            if close is None:
+                continue
+            d = date.fromtimestamp(ts)
+            rows.append({
+                "ticker": ticker,
+                "date":   d,
+                "close":  float(close),
+                "open":   float(quote["open"][i])   if quote.get("open")   and quote["open"][i]   is not None else None,
+                "high":   float(quote["high"][i])   if quote.get("high")   and quote["high"][i]   is not None else None,
+                "low":    float(quote["low"][i])    if quote.get("low")    and quote["low"][i]    is not None else None,
+                "volume": int(quote["volume"][i])   if quote.get("volume") and quote["volume"][i] is not None else 0,
+            })
+        except (KeyError, IndexError, TypeError):
+            continue
+    return rows
+
+
 def fetch_daily_history(ticker: str, period: str = "1mo") -> list[dict]:
-    """Fetch daily OHLCV for the past `period`. Returns list of dicts ready to insert."""
+    """
+    Fetch daily OHLCV for the past `period`. Tries yfinance first,
+    falls back to Yahoo's v8 chart endpoint if yfinance reports the ticker
+    as missing/delisted.
+    """
     try:
         t = yf.Ticker(ticker)
         df = t.history(period=period, interval="1d", auto_adjust=False)
         if df.empty:
-            return []
+            return _fetch_via_yahoo_v8(ticker, period)
         rows = []
         for ts, row in df.iterrows():
             rows.append({
@@ -43,8 +91,8 @@ def fetch_daily_history(ticker: str, period: str = "1mo") -> list[dict]:
             })
         return rows
     except Exception as e:
-        log.warning("Failed history for %s: %s", ticker, e)
-        return []
+        log.warning("yfinance failed for %s: %s — trying v8 fallback", ticker, e)
+        return _fetch_via_yahoo_v8(ticker, period)
 
 
 def save_daily(rows: list[dict]) -> int:
@@ -90,18 +138,21 @@ def update_performance_pcts() -> None:
                 WITH latest AS (
                     SELECT DISTINCT ON (ticker) ticker, close, date
                     FROM prices_daily
+                    WHERE close IS NOT NULL
                     ORDER BY ticker, date DESC
                 ),
                 week_ago AS (
                     SELECT DISTINCT ON (pd.ticker) pd.ticker, pd.close
                     FROM prices_daily pd
                     WHERE pd.date <= CURRENT_DATE - INTERVAL '5 days'
+                      AND pd.close IS NOT NULL
                     ORDER BY pd.ticker, pd.date DESC
                 ),
                 month_ago AS (
                     SELECT DISTINCT ON (pd.ticker) pd.ticker, pd.close
                     FROM prices_daily pd
                     WHERE pd.date <= CURRENT_DATE - INTERVAL '22 days'
+                      AND pd.close IS NOT NULL
                     ORDER BY pd.ticker, pd.date DESC
                 )
                 UPDATE cluster_entities ce

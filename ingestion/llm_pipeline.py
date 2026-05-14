@@ -131,9 +131,14 @@ TICKER_ALIASES.update({
     "ntpc":                    "NTPC.NS",
     "power grid":              "POWERGRID.NS",
     "powergrid":               "POWERGRID.NS",
-    # Auto
-    "tata motors":             "TATAMOTORS.NS",
-    "tatamotors":              "TATAMOTORS.NS",
+    # Auto — Tata Motors demerged in 2024 (TATAMOTORS.NS retired by Yahoo)
+    "tata motors":             "TMCV.NS",         # parent listing (CV + JLR)
+    "tatamotors":              "TMCV.NS",
+    "tata motors cv":          "TMCV.NS",
+    "tml":                     "TMCV.NS",
+    "tata motors pv":          "TMPV.NS",         # passenger vehicle arm
+    "tata motors passenger":   "TMPV.NS",
+    "tmpv":                    "TMPV.NS",
     "hero motocorp":           "HEROMOTOCO.NS",
     "hero moto":               "HEROMOTOCO.NS",
     "hero":                    "HEROMOTOCO.NS",
@@ -264,8 +269,9 @@ TICKER_ALIASES.update({
     "varun beverages":         "VBL.NS",
     "tata consumer":           "TATACONSUM.NS",
     "tata consumer products":  "TATACONSUM.NS",
-    "united spirits":          "MCDOWELL-N.NS",
-    "diageo india":            "MCDOWELL-N.NS",
+    "united spirits":          "UNITDSPR.NS",
+    "diageo india":            "UNITDSPR.NS",
+    "mcdowell":                "UNITDSPR.NS",
     "radico khaitan":          "RADICO.NS",
     "united breweries":        "UBL.NS",
     "titan":                   "TITAN.NS",
@@ -379,8 +385,8 @@ TICKER_ALIASES.update({
     # Aviation & Logistics
     "interglobe":              "INDIGO.NS",
     "indigo":                  "INDIGO.NS",
-    "spicejet":                "SPICEJET.NS",
-    "air india":               "AIRINDIA.NS",
+    "spicejet":                "SPICEJET.BO",     # only listed on BSE
+    # "air india":  delisted — Tata took it private in 2022
     "container corporation":   "CONCOR.NS",
     "concor":                  "CONCOR.NS",
     "gati":                    "GATI.NS",

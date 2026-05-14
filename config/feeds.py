@@ -235,6 +235,8 @@ WATCHLIST_TICKERS = {
     "WIPRO.NS":      "Wipro",
     "ADANIENT.NS":   "Adani Ent",
     "MARUTI.NS":     "Maruti Suzuki",
+    "TMCV.NS":       "Tata Motors (CV+JLR)",
+    "TMPV.NS":       "Tata Motors PV",
     "LT.NS":         "L&T",
     "SBIN.NS":       "SBI",
     "BAJFINANCE.NS": "Bajaj Finance",

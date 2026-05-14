@@ -14,13 +14,45 @@ Run standalone:
     python -m ingestion.price_fetcher
 """
 
+import json
 import logging
+import urllib.request
 from datetime import datetime, timezone
 
 import yfinance as yf
 
 from config.feeds import WATCHLIST_TICKERS
 from db.connection import get_conn
+
+
+def _yahoo_v8_latest(ticker: str) -> dict | None:
+    """Fallback: fetch the latest day's OHLC from Yahoo's v8 chart endpoint."""
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range=5d&interval=1d"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.load(r)
+        result = (data.get("chart", {}).get("result") or [None])[0]
+        if not result:
+            return None
+        meta = result.get("meta", {})
+        q = (result.get("indicators", {}).get("quote") or [{}])[0]
+        closes = [c for c in (q.get("close") or []) if c is not None]
+        if not closes:
+            return None
+        opens   = [c for c in (q.get("open") or []) if c is not None]
+        highs   = [c for c in (q.get("high") or []) if c is not None]
+        lows    = [c for c in (q.get("low") or []) if c is not None]
+        volumes = [c for c in (q.get("volume") or []) if c is not None]
+        return {
+            "price":  float(meta.get("regularMarketPrice", closes[-1])),
+            "open":   float(opens[-1])   if opens   else None,
+            "high":   float(highs[-1])   if highs   else None,
+            "low":    float(lows[-1])    if lows    else None,
+            "volume": int(volumes[-1])   if volumes else 0,
+        }
+    except Exception:
+        return None
 
 logging.basicConfig(
     level=logging.INFO,
@@ -55,6 +87,21 @@ def fetch_prices(tickers: dict[str, str] | None = None) -> list[dict]:
             low   = getattr(info, "day_low", None)
 
             if price is None:
+                # yfinance gave up — try Yahoo v8 direct
+                fb = _yahoo_v8_latest(symbol)
+                if fb:
+                    price, open_, high, low = fb["price"], fb["open"], fb["high"], fb["low"]
+                    results.append({
+                        "ticker":      symbol,
+                        "price":       round(price, 4),
+                        "open":        round(open_, 4) if open_ else None,
+                        "high":        round(high, 4)  if high  else None,
+                        "low":         round(low, 4)   if low   else None,
+                        "volume":      fb["volume"],
+                        "recorded_at": now,
+                    })
+                    log.info("  %-18s  %.4f  (v8 fallback)", symbol, price)
+                    continue
                 log.warning("No price data for %s", symbol)
                 continue
 
