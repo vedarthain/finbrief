@@ -721,7 +721,7 @@ def save_clusters(clusters: list[dict], raw_items: list[dict]) -> int:
     return saved
 
 
-def dedup_clusters(threshold: float = 0.82) -> int:
+def dedup_clusters(threshold: float = 0.70) -> int:
     """
     Remove near-duplicate clusters created when the same story slipped into
     multiple batches.  For every pair of clusters on the same IST date +

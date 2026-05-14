@@ -22,6 +22,11 @@ from db.connection import init_schema
 from ingestion.rss_fetcher import run_all as fetch_rss
 from ingestion.price_fetcher import run_all as fetch_prices
 from ingestion.llm_pipeline import run_all as run_llm, update_price_impact
+from ingestion.daily_history import (
+    run_all as fetch_daily_history,
+    update_performance_pcts,
+    backfill_sectors,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,6 +64,10 @@ def main():
     if not args.no_llm:
         log.info("── Running LLM pipeline ────────────────────────")
         run_llm()
+
+    log.info("── Backfilling sectors + 1W/1M performance ─────")
+    backfill_sectors()
+    update_performance_pcts()
 
     log.info("── Pipeline complete ───────────────────────────")
 

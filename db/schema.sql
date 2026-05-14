@@ -33,6 +33,21 @@ CREATE TABLE IF NOT EXISTS prices (
 CREATE INDEX IF NOT EXISTS idx_prices_ticker_time ON prices (ticker, recorded_at DESC);
 
 
+-- ── Daily close prices — for 1D / 1W / 1M performance windows ───────────────
+CREATE TABLE IF NOT EXISTS prices_daily (
+    ticker    TEXT NOT NULL,
+    date      DATE NOT NULL,
+    close     NUMERIC(14, 4),
+    open      NUMERIC(14, 4),
+    high      NUMERIC(14, 4),
+    low       NUMERIC(14, 4),
+    volume    BIGINT,
+    PRIMARY KEY (ticker, date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_prices_daily_ticker ON prices_daily (ticker, date DESC);
+
+
 -- ── Clustered + synthesised stories ────────────────────────────────────────
 -- One cluster = one real-world event, deduped across sources
 CREATE TABLE IF NOT EXISTS clusters (
@@ -92,6 +107,19 @@ CREATE TABLE IF NOT EXISTS cluster_entities (
 
 CREATE INDEX IF NOT EXISTS idx_cluster_entities_cluster  ON cluster_entities (cluster_id);
 CREATE INDEX IF NOT EXISTS idx_cluster_entities_ticker   ON cluster_entities (ticker);
+
+-- Add 1W / 1M performance columns (idempotent — DO NOTHING if already exist)
+DO $$ BEGIN
+    ALTER TABLE cluster_entities ADD COLUMN price_change_1w_pct NUMERIC(8, 4);
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+
+DO $$ BEGIN
+    ALTER TABLE cluster_entities ADD COLUMN price_change_1m_pct NUMERIC(8, 4);
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
+
+DO $$ BEGIN
+    ALTER TABLE cluster_entities ADD COLUMN sector TEXT;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
 
 
 -- ── Daily morning brief snapshot ────────────────────────────────────────────

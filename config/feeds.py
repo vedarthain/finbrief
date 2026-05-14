@@ -247,12 +247,25 @@ WATCHLIST_TICKERS = {
     "NTPC.NS":       "NTPC",
     "POWERGRID.NS":  "Power Grid",
 
+    # Indian sector indices
+    "^CNXIT":     "Nifty IT",
+    "^CNXAUTO":   "Nifty Auto",
+    "^CNXFMCG":   "Nifty FMCG",
+    "^CNXPHARMA": "Nifty Pharma",
+    "^CNXMETAL":  "Nifty Metal",
+    "^CNXENERGY": "Nifty Energy",
+
     # Global Macro
     "^GSPC":    "S&P 500",
     "^IXIC":    "Nasdaq",
+    "^DJI":     "Dow Jones",
     "^HSI":     "Hang Seng",
     "^N225":    "Nikkei 225",
+    "^FTSE":    "FTSE 100",
+    "^GDAXI":   "DAX",
+    "^STOXX50E": "Stoxx 50",
     "GC=F":     "Gold",
+    "SI=F":     "Silver",
     "CL=F":     "Crude Oil (WTI)",
     "BZ=F":     "Crude Oil (Brent)",
     "USDINR=X": "USD/INR",
