@@ -14,10 +14,21 @@ load_dotenv()
 _pool: pool.SimpleConnectionPool | None = None
 
 
+def _clean_dsn(dsn: str) -> str:
+    """
+    Strip Neon-specific URL params that older libpq versions reject.
+    `channel_binding` requires libpq 13+; GitHub Actions Ubuntu may ship older.
+    SSL is still enforced via `sslmode=require`.
+    """
+    for bad in ("&channel_binding=require", "?channel_binding=require"):
+        dsn = dsn.replace(bad, "")
+    return dsn
+
+
 def _get_pool() -> pool.SimpleConnectionPool:
     global _pool
     if _pool is None:
-        dsn = os.environ["DATABASE_URL"]
+        dsn = _clean_dsn(os.environ["DATABASE_URL"])
         _pool = pool.SimpleConnectionPool(minconn=1, maxconn=5, dsn=dsn)
     return _pool
 
