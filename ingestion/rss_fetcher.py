@@ -115,6 +115,28 @@ _FLUFF_PATTERNS = [
     _re.compile(r"\b(goes viral|viral video|viral photo|netizens|trolled|trolls)\b"),
     _re.compile(r"\b(watch:|video:|pics:|in pics|in pictures)\b", _re.IGNORECASE),
     _re.compile(r"\b(uber ceo takes|man dies|woman dies|teen dies|child dies)\b"),
+
+    # Broker calls / stock picks / tip-sheet content
+    # These are recommendation columns, not real news. Pattern to keep:
+    # "X shares fall as Goldman cuts target" → KEEP (price reaction to analyst action)
+    # "Brokerages recommend X, Y, Z" → DROP (just tip sheet)
+    _re.compile(r"\b(stocks? to buy|stocks? to sell|stock picks?|stock ideas?)\b"),
+    _re.compile(r"\b(top \d+ stocks?|top stock (picks?|ideas?|bets?))\b"),
+    _re.compile(r"\brecommended? for gains? (of|up to)\b"),
+    _re.compile(r"\brecommend(?:s|ed)? (?:[a-z][a-z\s,&\-]+){1,5} (?:buy|shares?|stocks?)\b"),
+    _re.compile(r"\b(brokerages?|brokerage firms?) (?:recommend|pick|suggest|favou?r)\b"),
+    _re.compile(r"\b(buy|sell|hold) (?:call|rating|recommendation)s?\b"),
+    _re.compile(r"\b(intraday|day[\s-]?trading) (?:tips?|picks?|recommendations?|calls?)\b"),
+    _re.compile(r"\b(f&o|futures?\s+and\s+options) (?:picks?|tips?|strategy|strategies)\b"),
+    _re.compile(r"\bshares? for (?:short[\s-]?term|long[\s-]?term|intraday)\b"),
+    _re.compile(r"\bmarket analysts? (?:issue|recommend|suggest)\b"),
+    _re.compile(r"\b(?:axis|kotak|motilal|icici|hdfc|sharekhan|emkay|nuvama|jefferies)\s+(?:securities|institutional|direct)?\s*recommends?\b", _re.IGNORECASE),
+    _re.compile(r"\bnagaraj shetti|raja venkatraman|amol athawale|marketsmith\b", _re.IGNORECASE),
+    _re.compile(r"\bbuy [a-z][a-z\s,&\-]+ for (?:up to )?\d+(?:\.\d+)?%", _re.IGNORECASE),
+    # Headlines starting with "Buy <Stock>" or "Sell <Stock>" are recommendations
+    _re.compile(r"^(buy|sell)\s+[A-Z]", _re.IGNORECASE),
+    _re.compile(r"\b(?:trading|investment) calls? for\b"),
+    _re.compile(r"\btarget price (?:of )?₹|target ₹\d"),
 ]
 
 
