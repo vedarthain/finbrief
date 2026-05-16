@@ -72,6 +72,33 @@ _FLUFF_PATTERNS = [
     _re.compile(r"\b(weight loss|skincare|fashion|workout|fitness tips|beauty tips)\b"),
     _re.compile(r"\b(diet plan|yoga|meditation|wellness routine)\b"),
 
+    # Broker / analyst calls — but NOT news reports about stock moves driven by broker action.
+    # Block direct recommendation/pick-list headlines only.
+    _re.compile(r"^(buy|sell|hold)\s+[a-z]"),                            # "Buy Reliance ..."
+    _re.compile(r"\b(buy|sell|hold)\b[^.]{0,40}\b(target|tgt)\s*[:₹]?\s*\d"),  # "...target 1500"
+    _re.compile(r"\b(stocks? to buy|stocks? to sell|stock picks?|stock ideas?)\b"),
+    _re.compile(r"\btop \d+ stocks? to (buy|sell|invest|watch today)\b"),
+    _re.compile(r"\btop stock (picks?|ideas?|bets?|recommendations?)\b"),
+    _re.compile(r"\b(can|should) you buy [a-z]"),
+    _re.compile(r"\b(broker(age)? (call|tip|recommendation)|analyst pick)\b"),
+
+    # Movie / box office / OTT
+    _re.compile(r"\b(box office|day \d+ collection|opening day|opening weekend|single[\s-]?day collection)\b"),
+    _re.compile(r"\b(collected|collects|crores)\s+(at the box office|on day|in (its|first)\s+(week|weekend))\b"),
+    _re.compile(r"\b(movie review|film review|first day first show|fdfs)\b"),
+    _re.compile(r"\bdhurandhar|jawan|pathaan|kalki|pushpa|baahubali|kgf\b"),
+
+    # Bollywood gossip / celebrity personal — expand beyond existing pattern
+    _re.compile(r"\b(preity zinta|celina jaitly|kareena|katrina|deepika|alia|priyanka chopra|salman khan|shah rukh khan|aamir khan|akshay kumar|hrithik|ranveer|ranbir|aishwarya)\b"),
+    _re.compile(r"\b(wrote a note|shared a (post|pic|video)|breaks silence|spotted at|seen at)\b"),
+
+    # Regional agricultural-university / weather forecasts (not market-moving)
+    # Note: "kharif sowing", "rabi sowing", "monsoon" alone can appear in legit
+    # macro/inflation news — only block when the headline is *primarily* a forecast.
+    _re.compile(r"\b(tamil nadu agricultural|agricultural university)\b"),
+    _re.compile(r"\btnau forecasts?\b"),
+    _re.compile(r"\b(near[\s-]?normal monsoon (for|in) (a|the)?\s*(state|region|district|kerala|tamil nadu|karnataka|maharashtra))\b"),
+
     # Sports
     _re.compile(r"\b(cricket|cricketer|cricketers|football|footballer|tennis|olympics|fifa|ipl|world cup|t20|odi|test match)\b"),
     _re.compile(r"\b(virat|rohit|dhoni|messi|ronaldo|kohli|rayudu|mcclenaghan|gambhir|ashwin|jadeja|sehwag|gavaskar)\b"),
