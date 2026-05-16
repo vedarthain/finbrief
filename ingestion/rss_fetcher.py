@@ -73,8 +73,10 @@ _FLUFF_PATTERNS = [
     _re.compile(r"\b(diet plan|yoga|meditation|wellness routine)\b"),
 
     # Sports
-    _re.compile(r"\b(cricket|football|tennis|olympics|fifa|ipl|world cup|t20|odi|test match)\b"),
-    _re.compile(r"\b(virat|rohit|dhoni|messi|ronaldo|kohli)\b"),
+    _re.compile(r"\b(cricket|cricketer|cricketers|football|footballer|tennis|olympics|fifa|ipl|world cup|t20|odi|test match)\b"),
+    _re.compile(r"\b(virat|rohit|dhoni|messi|ronaldo|kohli|rayudu|mcclenaghan|gambhir|ashwin|jadeja|sehwag|gavaskar)\b"),
+    _re.compile(r"\b(batsman|bowler|wicket|innings|runs scored|over rate|all[\s-]?rounder)\b"),
+    _re.compile(r"\b(bcci|icc cricket|test series|odi series|t20 series|asia cup)\b"),
 
     # Crime / accidents / personal tragedy — not financial news
     _re.compile(r"\b(rape|raped|gang-rape|gang rape|molested|molestation|sexual assault)\b"),
