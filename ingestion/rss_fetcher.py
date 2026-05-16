@@ -123,7 +123,10 @@ _FLUFF_PATTERNS = [
     # "X shares fall as Goldman cuts target" → KEEP (price reaction to analyst action)
     # "Brokerages recommend X, Y, Z" → DROP (just tip sheet)
     _re.compile(r"\b(stocks? to buy|stocks? to sell|stock picks?|stock ideas?)\b"),
-    _re.compile(r"\b(top \d+ stocks?|top stock (picks?|ideas?|bets?))\b"),
+    # Only treat "top N stocks" as a pick if followed by "to buy/sell" or as a header phrase.
+    # "DII buying ... top 10 stocks" is real news — must NOT match here.
+    _re.compile(r"\btop \d+ stocks? to (buy|sell|invest|watch today)\b"),
+    _re.compile(r"\btop stock (picks?|ideas?|bets?|recommendations?)\b"),
     _re.compile(r"\brecommended? for gains? (of|up to)\b"),
     _re.compile(r"\brecommend(?:s|ed)? (?:[a-z][a-z\s,&\-]+){1,5} (?:buy|shares?|stocks?)\b"),
     _re.compile(r"\b(brokerages?|brokerage firms?) (?:recommend|pick|suggest|favou?r)\b"),
