@@ -119,6 +119,19 @@ _FLUFF_PATTERNS = [
     # Politics / elections fluff (keep pure policy/budget — those mention "policy", "budget", "rbi")
     _re.compile(r"\bbypoll|by-election|by election\b"),
     _re.compile(r"\b(rally|roadshow|campaign trail|election commission)\b"),
+    # Political appointments / oaths / cabinet formation — not market-moving.
+    # Note: real policy news ("Cabinet approves ₹X cr scheme") doesn't trigger
+    # these because they require oath/swearing/MLA/MP/CM keywords.
+    _re.compile(r"\btook? oath as (the )?(chief minister|cm|minister|mla|mp|governor)\b"),
+    _re.compile(r"\bsworn[\s-]?in as (the )?(chief minister|cm|minister|mla|mp|governor|president|prime minister)\b"),
+    _re.compile(r"\bswearing[\s-]?in (ceremony|of)\b"),
+    _re.compile(r"\bcouncil of \d* ?ministers\b"),
+    _re.compile(r"\bcabinet (reshuffle|expansion|formation|sworn[\s-]?in)\b"),
+    _re.compile(r"\b(mla|mp|cm|chief minister)[\s-]?(elect|designate|candidate)\b"),
+    _re.compile(r"\b(vidhan sabha|lok sabha|rajya sabha) (session|adjourned|passes)\b"),
+    _re.compile(r"\b(no[\s-]?confidence motion|floor test|trust vote|whip issued)\b"),
+    _re.compile(r"\b(party president|party chief|spokesperson) (says|slams|attacks|hits back)\b"),
+    _re.compile(r"\b(udf|ldf|nda|inc|bjp|congress|aap|tmc|rjd|jdu)\s+(government|leader|alliance)\s+(forms?|won|loses|sworn)\b"),
 
     # Personal-life / opinion columns
     _re.compile(r"^\d+\s+(?:things|ways|reasons|tips|signs|habits|mistakes)\b"),
